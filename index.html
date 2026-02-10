@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direction Quest: Mandarin Year 3</title>
+    <style>
+        :root {
+            --rbx-dark: #191B1D;
+            --rbx-card: #2B2D2F;
+            --rbx-blue: #00A2FF;
+            --rbx-green: #00B060;
+            --rbx-red: #F6412D;
+            --text-main: #FFFFFF;
+            --text-sec: #ADB5BD;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--rbx-dark);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-container {
+            background-color: var(--rbx-card);
+            width: 90%;
+            max-width: 600px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            background: rgba(0, 162, 255, 0.2);
+            color: var(--rbx-blue);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid var(--rbx-blue);
+        }
+
+        .instruction-area {
+            margin-bottom: 40px;
+        }
+
+        .lang-ms { font-size: 18px; color: var(--text-main); margin-bottom: 5px; }
+        .lang-en { font-size: 16px; color: var(--text-sec); font-style: italic; margin-bottom: 20px; }
+
+        .visual-display {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        #direction-icon {
+            font-size: 100px;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .btn-option {
+            background: #3F4143;
+            border: none;
+            padding: 20px 10px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 4px solid #1a1b1c;
+        }
+
+        .btn-option:hover {
+            background: #4F5153;
+            transform: translateY(-2px);
+        }
+
+        .btn-option:active {
+            transform: translateY(2px);
+            border-bottom-width: 0;
+        }
+
+        .btn-option .hanzi {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .btn-option .pinyin {
+            font-size: 14px;
+            color: var(--text-sec);
+        }
+
+        #feedback {
+            margin-top: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            height: 30px;
+        }
+
+        .correct { color: var(--rbx-green); }
+        .wrong { color: var(--rbx-red); }
+
+        .score-box {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Modal styling */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="header-top">
+            <div class="score-box">💰 <span id="score">0</span></div>
+            <div class="badge">YEAR 3 MANDARIN</div>
+        </div>
+
+        <div class="instruction-area">
+            <div class="lang-ms">Pilih arah yang betul berdasarkan ikon:</div>
+            <div class="lang-en">Choose the correct direction based on the icon:</div>
+        </div>
+
+        <div class="visual-display">
+            <div id="direction-icon">⬆️</div>
+            <div id="hint-text" style="color: var(--rbx-blue); font-weight: bold; margin-top: 10px;"></div>
+        </div>
+
+        <div class="options-grid">
+            <button class="btn-option" onclick="checkAnswer('上')">
+                <span class="hanzi">上</span><span class="pinyin">shàng</span>
+            </button>
+            <button class="btn-option" onclick="checkAnswer('下')">
+                <span class="hanzi">下</span><span class="pinyin">xià</span>
+            </button>
+            <button class="btn-option" onclick="checkAnswer('左')">
+                <span class="hanzi">左</span><span class="pinyin">zuǒ</span>
+            </button>
+            <button class="btn-option" onclick="checkAnswer('右')">
+                <span class="hanzi">右</span><span class="pinyin">yòu</span>
+            </button>
+            <button class="btn-option" onclick="checkAnswer('前')">
+                <span class="hanzi">前</span><span class="pinyin">qián</span>
+            </button>
+            <button class="btn-option" onclick="checkAnswer('后')">
+                <span class="hanzi">后</span><span class="pinyin">hòu</span>
+            </button>
+        </div>
+
+        <div id="feedback"></div>
+    </div>
+
+    <div id="win-overlay" class="overlay">
+        <h1 style="color: var(--rbx-green); font-size: 50px;">TAHNIAH!</h1>
+        <p style="font-size: 20px;">Anda telah mengumpul 100 Robux!</p>
+        <button onclick="resetGame()" style="padding: 15px 30px; border-radius: 10px; cursor: pointer; border: none; background: var(--rbx-blue); color: white; font-weight: bold;">Main Semula / Play Again</button>
+    </div>
+
+    <script>
+        const questData = [
+            { icon: '⬆️', word: '上', ms: 'Atas', en: 'Up' },
+            { icon: '⬇️', word: '下', ms: 'Bawah', en: 'Down' },
+            { icon: '⬅️', word: '左', wordEn: 'Left', ms: 'Kiri', en: 'Left' },
+            { icon: '➡️', word: '右', wordEn: 'Right', ms: 'Kanan', en: 'Right' },
+            { icon: '🚶‍♂️💨', word: '前', ms: 'Depan', en: 'In Front' },
+            { icon: '🚶‍♂️⬅️', word: '后', ms: 'Belakang', en: 'Behind' }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+
+        function updateQuest() {
+            // Pick a random direction different from current
+            let newIdx;
+            do {
+                newIdx = Math.floor(Math.random() * questData.length);
+            } while (newIdx === currentIdx);
+            
+            currentIdx = newIdx;
+            document.getElementById('direction-icon').innerText = questData[currentIdx].icon;
+            document.getElementById('hint-text').innerText = `${questData[currentIdx].ms} / ${questData[currentIdx].en}`;
+            document.getElementById('feedback').innerText = "";
+        }
+
+        function checkAnswer(userChoice) {
+            const feedback = document.getElementById('feedback');
+            if (userChoice === questData[currentIdx].word) {
+                score += 10;
+                document.getElementById('score').innerText = score;
+                feedback.innerHTML = '<span class="correct">Betul! / Correct! ✓</span>';
+                
+                if (score >= 100) {
+                    document.getElementById('win-overlay').style.display = 'flex';
+                } else {
+                    setTimeout(updateQuest, 1000);
+                }
+            } else {
+                feedback.innerHTML = '<span class="wrong">Ops! Cuba lagi / Try again ✗</span>';
+            }
+        }
+
+        function resetGame() {
+            score = 0;
+            document.getElementById('score').innerText = score;
+            document.getElementById('win-overlay').style.display = 'none';
+            updateQuest();
+        }
+
+        // Initialize
+        updateQuest();
+    </script>
+</body>
+</html>
+
